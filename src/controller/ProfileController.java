@@ -59,7 +59,12 @@ public class ProfileController {
     }
 
     private void login() {
-
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter phone:");
+        String phone = scanner.next();
+        System.out.print("Enter password:");
+        String password = scanner.next();
+        profileService.getByPhoneAndPassword(phone, password);
 
     }
 

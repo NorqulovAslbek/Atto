@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class Profile {
+    private Integer id;
     private String name;
     private String surname;
     private String phone;
