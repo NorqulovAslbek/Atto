@@ -1,51 +1,78 @@
 package db;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+
 public class Database {
-    String s = "1. Profile (name,surname,phone unique,pswd,created_date,status,role)\n" +
-            "  2. Card (number,exp_date,balance,status,phone,created_date)\n" +
-            "  3. Terminal (code,address,status,created_date)\n" +
-            "  4. Transaction (card_number,amount,terminal_code,type,created_date)\n";
+    public static Connection getConnection() {
+        try {
+            Connection con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/jdbc_db", "jdbc_user", "123456");
+            return con;
+        } catch (SQLException e) {
+            System.out.println(e.getSQLState());
+            e.printStackTrace();
+            System.exit(-1);
+        }
+        return null;
 
-    public static void createTable() {
-        String transaction = "create table if not exists transaction(\n" +
-                "id serial\n" +
-                "card_number varchar(30)\n" +
-                "amount varchar(30)\n" +
-                "terminal_code varchar(30) unique\n" +
-                "type varchar(10)\n" +
-                "created_date timestamp\n" +
+    }
 
+    public static void initTable() {
 
-                ");";
+        String profile = "create table if not exists profile ( \n" +
+                "             id serial primary key,\n" +
+                "             name varchar(20) not null,\n" +
+                "             surname varchar(20) not null,\n" +
+                "             phone varchar(12),\n" +
+                "             password varchar not null,\n" +
+                "             created_date timestamp not null default now(),\n" +
+                "             status varchar(20) not null, \n" +
+                "             role varchar not null\n" + ");";
 
-        String terminal = "create table if not exists terminal(\n" +
-                "id serial\n" +
-                "code varchar(30)\n" +
-                "address varchar(30)\n" +
-                "status varchar(15)\n" +
-                "created_date timestamp\n" +
-                ");";
-
-        String profile = "create table if not exists profile(\n" +
-                "id serial\n" +
-                "name varchar(30)\n" +
-                "surname varchar(30)\n" +
-                "phone varchar(30) unique\n" +
-                "password varchar(50)\n" +
-                "created_date timestamp\n" +
-                "status varchar(15)\n" +
-                "role varchar(15)\n" +
-                ");";
 
         String card = "create table if not exists card(\n" +
-                "id serial\n" +
-                "numbers varchar(30)\n" +
-                "exp_date varchar(30)\n" +
-                "balance varchar(30)\n" +
-                "status varchar(10)\n" +
-                "phone varchar(15)\n" +
-                "created_date timestamp\n" +
-                ");";
+                "   id serial primary key,\n" +
+                "   card_number varchar unique,\n" +
+                "   exp_date date not null,\n" +
+                "   balance numeric not null,\n" +
+                "   status varchar(20) not null,\n" +
+                "   phone varchar(12) ,\n" +
+                "   added_date timestamp ,\n" +
+                "   visible boolean default true ,\n" +
+                "   created_date timestamp not null default now()\n" + ");";
 
+
+        String terminal = "create table if not exists terminal( id serial primary key, " +
+                "code varchar unique not null ," +
+                "address varchar ," +
+                "status varchar, " +
+                "visible boolean default true, " +
+                "created_date timestamp default now()) ;";
+
+        String transaction = "create table if not exists transaction( id serial primary key, " +
+                "card_id int not null, " +
+                "amount numeric , " +
+                "terminal_id int , " +
+                "type varchar , " +
+                "created_date timestamp default now()," +
+                " foreign key(card_id) references  card(id), " +
+                " foreign key(terminal_id) references  terminal(id)) ;";
+
+        execute(profile);
+        execute(card);
+        execute(terminal);
+        execute(transaction);
+    }
+
+    private static void execute(String sql) {
+        try (Connection connection = getConnection()) {
+            Statement statement = connection.createStatement();
+            statement.executeUpdate(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
