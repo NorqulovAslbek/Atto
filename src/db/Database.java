@@ -1,15 +1,23 @@
 package db;
 
+import dto.Card;
+import dto.Profile;
+import enums.GeneralStatus;
+import enums.ProfileRole;
+import repository.CardRepository;
+import repository.ProfileRepository;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-
-public class Database {
+public class DataBase {
     public static Connection getConnection() {
         try {
-            Connection con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/jdbc_db", "jdbc_user", "123456");
+            Connection con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/jdbc_user", "jdbc_db", "12345");
             return con;
         } catch (SQLException e) {
             System.out.println(e.getSQLState());
@@ -75,4 +83,6 @@ public class Database {
             e.printStackTrace();
         }
     }
+
+
 }

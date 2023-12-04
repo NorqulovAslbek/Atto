@@ -1,70 +1,118 @@
 package controller;
 
 import dto.Profile;
-import enums.GeneralStatus;
-import enums.ProfileRole;
+import service.CardService;
 import service.ProfileService;
 import util.ScannerUtil;
 
-import java.time.LocalDateTime;
 import java.util.Scanner;
 
 public class ProfileController {
-    ProfileService profileService = new ProfileService();
+    private CardService cardService = new CardService();
 
+    public void start(Profile profile) {
+        boolean b = true;
 
-    public void start() {
-        boolean k = true;
-        while (k) {
-            showMenu();
-            switch (ScannerUtil.getAction()) {
-                case 1 -> login();
-                case 2 -> registration();
-                case 0 -> {
-                    k = false;
-                }
-                default -> System.out.println("Boshqa menu tanlang!");
+        while (b) {
+            menu();
+            int operation = ScannerUtil.getAction();
+            switch (operation) {
+                case 1:
+                    addCard(profile);
+                    break;
+                case 2:
+                    cardList(profile);
+                    break;
+                case 3:
+                    changeCardStatus(profile);
+                    break;
+                case 4:
+                    deleteCard(profile);
+                    break;
+                case 5:
+                    refill(profile);
+                    break;
+                case 6:
+                    transactionList();
+                    break;
+                case 7:
+                    payment();
+                    break;
+                case 0:
+                    b = false;
+                    break;
+                default:
+                    b = false;
+                    System.out.println("Wrong operation number");
             }
         }
     }
 
-    private void showMenu() {
-        System.out.print("""
-                1.login.
-                2.registration.
-                0.exit.
-                """);
+
+    public void menu() {
+        System.out.println("1. Add Card");
+        System.out.println("2. Card List ");
+        System.out.println("3. Card Change Status");
+        System.out.println("4. Delete Card");
+        System.out.println("5. ReFill ");
+        System.out.println("6. Transaction List");
+        System.out.println("7. Make Payment");
+        System.out.println("0. Log out");
+    }
+
+    /**
+     * Card
+     */
+
+    private void addCard(Profile profile) {
+        System.out.print("Enter card number: ");
+
+        Scanner scanner = new Scanner(System.in);
+        String cardNumber = scanner.nextLine();
+
+        cardService.addCardToProfile(profile.getPhone(), cardNumber);
+    }
+
+    private void cardList(Profile profile) {
+        System.out.print("--- Card List ---");
+        cardService.profileCardList(profile.getPhone());
+    }
+
+    private void changeCardStatus(Profile profile) {
+        System.out.print("Enter card number: ");
+
+        Scanner scanner = new Scanner(System.in);
+        String cardNumber = scanner.nextLine();
+        cardService.userChangeCardStatus(profile.getPhone(), cardNumber);
+    }
+
+    private void deleteCard(Profile profile) {
+        System.out.print("Enter card number: ");
+        Scanner scanner = new Scanner(System.in);
+        String cardNumber = scanner.nextLine();
+
+        cardService.userDeleteCard(profile.getPhone(), cardNumber);
+    }
+
+    private void refill(Profile profile) {
+        System.out.print("Enter card number: ");
+        Scanner scanner = new Scanner(System.in);
+        String cardNumber = scanner.nextLine();
+
+        System.out.print("Enter amount: ");
+        Double amount = scanner.nextDouble();
+        cardService.userRefillCard(profile.getPhone(), cardNumber, amount);
     }
 
 
-    private void registration() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter name:");
-        String name = scanner.next();
-        System.out.print("Enter surname:");
-        String surname = scanner.next();
-        System.out.print("Enter phone:");
-        String phone = scanner.next();
-        System.out.print("Enter password:");
-        String password = scanner.next();
-        Profile profile = new Profile();
-        profile.setName(name);
-        profile.setSurname(surname);
-        profile.setPhone(phone);
-        profile.setPassword(password);
-        profile.setCreated_date(LocalDateTime.now());
-        profile.setStatus(GeneralStatus.ACTIVE);
-        profile.setRole(ProfileRole.USER);
-        profileService.registrationService(profile);
+    /**
+     * Transaction
+     */
+    private void transactionList() {
+
     }
 
-    private void login() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter phone:");
-        String phone = scanner.next();
-        System.out.print("Enter password:");
-        String password = scanner.next();
-        profileService.getByPhoneAndPassword(phone, password);
+    private void payment() {
 
     }
 
